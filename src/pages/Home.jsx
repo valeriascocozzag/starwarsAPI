@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import { getElementIndex } from "../services/api.js"
+import { getElementIndex } from "../services/api.js";
 import { fotosPersonajes, fotosPlanetas, fotosVehiculos } from "../assets/imagenes.jsx";
 
 // Función para buscar imagen por nombre y tipo
@@ -30,46 +30,77 @@ export const Home = () => {
     handleGetLists();
   }, []);
 
-  // Renderizado de tarjetas con navegación al Single.jsx
-  const renderCard = (element, tipo) => (
-    <div
-      className="card bg-white text-dark m-2"
-      style={{ width: "12rem", flex: "0 0 auto" }}
-      key={`${tipo}-${element.uid}`}
-    >
-      <img
-        src={obtenerImagen(element.name, tipo)}
-        alt={element.name}
-        className="card-img-top"
-        style={{ height: "150px", objectFit: "cover" }}
-      />
-      <div className="card-body">
-        <h6 className="card-title">{element.name}</h6>
-        <Link to={`/single/${tipo}/${element.uid}`} className="btn btn-outline-primary btn-sm mt-2">
-          Ver más
-        </Link>
+  // Renderizado de tarjetas con navegación al Single.jsx y botón de favoritos
+  const renderCard = (element, tipo) => {
+    const isFavorito = store.favorites?.some(
+      fav => fav.uid === element.uid && fav.type === tipo
+    );
+
+    const toggleFavorito = () => {
+      if (isFavorito) {
+        dispatch({ type: "REMOVE_FAVORITE", payload: { uid: element.uid, type: tipo } });
+      } else {
+        dispatch({
+          type: "ADD_FAVORITE",
+          payload: {
+            uid: element.uid,
+            type: tipo,
+            name: element.name,
+            url: `/single/${tipo}/${element.uid}`,
+          },
+        });
+      }
+    };
+
+    return (
+      <div
+        className="card bg-white text-dark m-2"
+        style={{ width: "12rem", flex: "0 0 auto" }}
+        key={`${tipo}-${element.uid}`}
+      >
+        <img
+          src={obtenerImagen(element.name, tipo)}
+          alt={element.name}
+          className="card-img-top"
+          style={{ height: "150px", objectFit: "cover" }}
+        />
+        <div className="card-body">
+          <h6 className="card-title d-flex justify-content-between align-items-center">
+            {element.name}
+            <button
+              onClick={toggleFavorito}
+              className="btn btn-sm p-0"
+              style={{ background: "none", border: "none" }}
+            >
+              <i className={`fa${isFavorito ? "s" : "r"} fa-star`} style={{ color: "#f5c518" }}></i>
+            </button>
+          </h6>
+          <Link to={`/single/${tipo}/${element.uid}`} className="btn btn-outline-primary btn-sm mt-2">
+            Ver más
+          </Link>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="text-dark py-5">
       <div className="container">
 
         {/* Vehículos */}
-        <h4 className="mb-3 text-white">Vehículos</h4>
+        <h4 className="mt-5 mb-3 text-white">Vehículos</h4>
         <div className="d-flex overflow-auto px-2 pb-3">
           {vehicleList.map((vehicle) => renderCard(vehicle, "vehicles"))}
         </div>
 
         {/* Personajes */}
-        <h4 className="mb-3 text-white">Personajes</h4>
+        <h4 className="mt-5 mb-3 text-white">Personajes</h4>
         <div className="d-flex overflow-auto px-2 pb-3">
           {peopleList.map((person) => renderCard(person, "people"))}
         </div>
 
         {/* Planetas */}
-        <h4 className="mb-3 text-white">Planetas</h4>
+        <h4 className="mt-5 mb-3 text-white">Planetas</h4>
         <div className="d-flex overflow-auto px-2 pb-3">
           {planetList.map((planet) => renderCard(planet, "planets"))}
         </div>
