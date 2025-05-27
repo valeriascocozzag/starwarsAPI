@@ -1,32 +1,42 @@
-export const initialStore=()=>{
-  return{
-    message: null,
-    todos: [
-      {
-        id: 1,
-        title: "Make the bed",
-        background: null,
-      },
-      {
-        id: 2,
-        title: "Do my homework",
-        background: null,
+import React, { createContext, useContext, useReducer } from "react";
+
+const initialState = {
+  favorites: [],
+};
+
+const GlobalContext = createContext();
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "ADD_FAVORITE":
+      if (state.favorites.some(fav => fav.uid === action.payload.uid && fav.type === action.payload.type)) {
+        return state;
       }
-    ]
-  }
-}
-
-export default function storeReducer(store, action = {}) {
-  switch(action.type){
-    case 'add_task':
-
-      const { id,  color } = action.payload
-
       return {
-        ...store,
-        todos: store.todos.map((todo) => (todo.id === id ? { ...todo, background: color } : todo))
+        ...state,
+        favorites: [...state.favorites, action.payload],
       };
+
+    case "REMOVE_FAVORITE":
+      return {
+        ...state,
+        favorites: state.favorites.filter(
+          fav => fav.uid !== action.payload.uid || fav.type !== action.payload.type
+        ),
+      };
+
     default:
-      throw Error('Unknown action.');
-  }    
-}
+      return state;
+  }
+};
+
+export const GlobalProvider = ({ children }) => {
+  const [store, dispatch] = useReducer(reducer, initialState);
+  return (
+    <GlobalContext.Provider value={{ store, dispatch }}>
+      {children}
+    </GlobalContext.Provider>
+  );
+};
+
+export const useGlobalStore = () => useContext(GlobalContext);
