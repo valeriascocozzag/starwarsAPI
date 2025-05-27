@@ -1,42 +1,27 @@
-import React, { createContext, useContext, useReducer } from "react";
-
-const initialState = {
-  favorites: [],
+export const initialState = {
+  favorites: JSON.parse(localStorage.getItem("favorites")) || [],
 };
 
-const GlobalContext = createContext();
-
-const reducer = (state, action) => {
+export const reducer = (state, action) => {
   switch (action.type) {
-    case "ADD_FAVORITE":
+    case "ADD_FAVORITE": {
       if (state.favorites.some(fav => fav.uid === action.payload.uid && fav.type === action.payload.type)) {
         return state;
       }
-      return {
-        ...state,
-        favorites: [...state.favorites, action.payload],
-      };
+      const updatedFavorites = [...state.favorites, action.payload];
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      return { ...state, favorites: updatedFavorites };
+    }
 
-    case "REMOVE_FAVORITE":
-      return {
-        ...state,
-        favorites: state.favorites.filter(
-          fav => fav.uid !== action.payload.uid || fav.type !== action.payload.type
-        ),
-      };
+    case "REMOVE_FAVORITE": {
+      const updatedFavorites = state.favorites.filter(
+        fav => fav.uid !== action.payload.uid || fav.type !== action.payload.type
+      );
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      return { ...state, favorites: updatedFavorites };
+    }
 
     default:
       return state;
   }
 };
-
-export const GlobalProvider = ({ children }) => {
-  const [store, dispatch] = useReducer(reducer, initialState);
-  return (
-    <GlobalContext.Provider value={{ store, dispatch }}>
-      {children}
-    </GlobalContext.Provider>
-  );
-};
-
-export const useGlobalStore = () => useContext(GlobalContext);

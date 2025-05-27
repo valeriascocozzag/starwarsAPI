@@ -31,8 +31,8 @@ export const Single = () => {
     fetchData();
   }, [type, uid]);
 
-  if (loading) return <p className="text-center mt-5 fs-4">🛰️ Cargando datos...</p>;
-  if (!item) return <p className="text-center mt-5 fs-4 text-danger">⚠️ No se encontró el elemento.</p>;
+  if (loading) return <p className="text-center mt-5 fs-4">Cargando datos...</p>;
+  if (!item) return <p className="text-center mt-5 fs-4 text-danger"> No se encontró el elemento.</p>;
 
   const { description, properties } = item;
   const name = properties?.name || "Sin nombre";
@@ -43,7 +43,6 @@ export const Single = () => {
     vehicles: ["model", "manufacturer", "cost_in_credits", "max_atmosphering_speed", "crew", "passengers"],
   };
 
-  // ✅ Función de favoritos
   const isFavorito = store.favorites?.some(
     (fav) => fav.uid === uid && fav.type === type
   );
@@ -68,7 +67,6 @@ export const Single = () => {
     <div className="container my-5">
       <div className="card bg-black text-light border rounded-4 shadow-lg overflow-hidden">
         <div className="row g-0 align-items-center">
-          {/* Imagen */}
           <div className="col-lg-6 p-4 text-center bg-dark">
             <img
               src={fotosName(name)}
@@ -77,28 +75,20 @@ export const Single = () => {
               style={{ maxHeight: "400px", objectFit: "cover" }}
             />
           </div>
-
-          {/* Info principal */}
           <div className="col-lg-6 p-4">
             <h1 className="text-primary fw-bold display-5">{name}</h1>
-
             <button
-              className={`btn ${isFavorito ? "btn-primary" : "btn-outline-secondary"} mt-3`}
+              className={`btn ${isFavorito ? "btn-primary" : "btn-outline-info"} mt-3`}
               onClick={toggleFavorito}
             >
-              {isFavorito ? "💛 Quitar de favoritos" : "🤍 Agregar a favoritos"}
+              {isFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
             </button>
-
             <p className="mt-4 fs-5 text-white-50 fst-italic">
-              {description || "No hay descripción disponible para este elemento de la galaxia."}
+              {description || "No hay descripción disponible para este elemento."}
             </p>
           </div>
         </div>
-
-        {/* Línea divisoria */}
         <div className="border-top mt-3 mb-0"></div>
-
-        {/* Detalles en bloques */}
         <div className="row text-center p-4 bg-dark bg-opacity-50">
           {keysToShow[type]?.map((key) => (
             <div className="col-6 col-md-3 col-lg-2 mb-4" key={key}>
